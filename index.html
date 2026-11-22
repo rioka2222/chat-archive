@@ -195,6 +195,13 @@ function parseChat(text){
    const sender=match[1].trim();
    const time=match[2]+' '+match[3];
    const content=match[4];
+     .replace(/(^|\s)이모티콘(?=\s|$)/g, ' ')
+  .trim();
+
+if(!content) {
+  last=null;
+  continue;
+}
 
    result.push({
     sender,
