@@ -20,6 +20,20 @@ input[type=text],textarea{
 width:100%;padding:12px;border:1px solid #ddd;border-radius:7px;
 font-size:14px;outline:none;font-family:inherit
 }
+ select{
+width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:7px;
+font-size:13px;
+background:white;
+color:#333;
+font-family:inherit;
+}
+
+.setting-row{
+margin-top:18px;
+}
 textarea{min-height:220px;resize:vertical;line-height:1.8}
 input:focus,textarea:focus{border-color:#555}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -36,9 +50,21 @@ button.secondary:hover{background:#ddd}
 .day span{background:#eee;padding:7px 14px;border-radius:20px}
 .msg{display:flex;flex-direction:column;align-items:flex-start;margin:17px 0}
 .msg.right{align-items:flex-end}
+ body.all-left .msg.right {
+  align-items: flex-start;
+}
 .sender{font-size:11px;color:#888;margin:0 4px 6px}
-.bubble{max-width:82%;padding:12px 15px;border-radius:6px;background:#eee;color:#222;font-size:14px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
-.right .bubble{color:#222}
+.bubble{
+max-width:82%;
+padding:12px 15px;
+border-radius:var(--bubble-radius, 6px);
+background:#eee;
+color:#222;
+font-size:14px;
+line-height:1.8;
+white-space:pre-wrap;
+overflow-wrap:anywhere
+}.right .bubble{color:#222}
 .empty{text-align:center;color:#aaa;padding:45px 10px;font-size:13px;line-height:2}
 footer{text-align:center;padding:30px;color:#aaa;font-size:10px;letter-spacing:2px}
 @media(max-width:550px){
@@ -84,7 +110,22 @@ header h1{font-size:25px}
 <input type="text" id="rightColor" value="#eeeeee" placeholder="#eeeeee">
 </div>
 </div>
- 
+<div class="setting-row">
+  <label for="bubbleAlign">말풍선 위치</label>
+  <select id="bubbleAlign">
+    <option value="default">기존처럼 좌우 구분</option>
+    <option value="left">모두 왼쪽 정렬</option>
+  </select>
+</div> 
+ <div class="setting-row">
+  <label for="bubbleRadius">말풍선 둥글기</label>
+  <select id="bubbleRadius">
+    <option value="24px">제일 둥글게</option>
+    <option value="18px">카톡만큼</option>
+    <option value="6px" selected>지금 같은 느낌</option>
+    <option value="0px">완전 사각형</option>
+  </select>
+</div>
 <div class="actions">
 <button id="convert">대화록 변환하기</button>
 <button class="secondary" id="clear">초기화</button>
@@ -227,6 +268,13 @@ $('clear').addEventListener('click',()=>{
  $('chatInput').value='';
  messages=[];
  participants=[];
+
+ $('bubbleAlign').value='default';
+ $('bubbleRadius').value='6px';
+
+ document.body.classList.remove('all-left');
+ document.documentElement.style.setProperty('--bubble-radius','6px');
+
  $('status').textContent='초기화.';
  render();
 });
@@ -235,7 +283,18 @@ $('nameA').addEventListener('input',render);
 $('nameB').addEventListener('input',render);
 $('leftColor').addEventListener('input',render);
 $('rightColor').addEventListener('input',render);
-
+$('bubbleAlign').addEventListener('change', function () {
+  document.body.classList.toggle(
+    'all-left',
+    this.value === 'left'
+  );
+});
+ $('bubbleRadius').addEventListener('change', function () {
+  document.documentElement.style.setProperty(
+    '--bubble-radius',
+    this.value
+  );
+});
 $('download').addEventListener('click',()=>{
  if(!messages.length){
   alert('먼저 대화를 변환해 줘!');
@@ -265,10 +324,13 @@ $('download').addEventListener('click',()=>{
   body+='</div>';
  });
 
- const css=document.querySelector('style').textContent;
+const radius=$('bubbleRadius').value;
+const alignClass=$('bubbleAlign').value==='left'?'all-left':'';
 
- const output='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CHAT ARCHIVE</title><style>'+css+'</style></head><body><header><small>PRIVATE CONVERSATION ARCHIVE</small><h1>CHAT LOG.</h1><p>A COLLECTION OF OUR STORIES</p></header><main><section id="conversation">'+body+'</section></main><footer>CHAT ARCHIVE · PRIVATE RECORDS</footer></body></html>';
+const css=':root{--bubble-radius:'+radius+';}'
+ +document.querySelector('style').textContent;
 
+const output='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CHAT ARCHIVE</title><style>'+css+'</style></head><body class="'+alignClass+'"><header><small>PRIVATE CONVERSATION ARCHIVE</small><h1>CHAT LOG.</h1><p>A COLLECTION OF OUR STORIES</p></header><main><section id="conversation">'+body+'</section></main><footer>CHAT ARCHIVE · PRIVATE RECORDS</footer></body></html>';
  const blob=new Blob([output],{type:'text/html;charset=utf-8'});
  const url=URL.createObjectURL(blob);
  const a=document.createElement('a');
