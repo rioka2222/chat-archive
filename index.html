@@ -138,7 +138,7 @@ header h1{font-size:25px}
 <div class="empty">CHAT ARCHIVE</div>
 </div>
 <div class="actions">
-<button id="download">HTML 다운로드</button>
+<button id="download">HTML 복사하기</button>
 </div>
 </section>
 </main>
@@ -295,11 +295,148 @@ $('bubbleAlign').addEventListener('change', function () {
     this.value
   );
 });
-$('download').addEventListener('click',()=>{
+
+$('download').addEventListener('click', async()=>{
  if(!messages.length){
-  alert('먼저 대화를 변환해 줘!');
+  alert('먼저 대화를 변환해 주세요');
   return;
  }
+
+ const radius=$('bubbleRadius').value;
+ const alignClass=$('bubbleAlign').value==='left'?'all-left':'';
+
+ const css=`
+.chat-archive-backup,
+.chat-archive-backup *{
+ box-sizing:border-box;
+}
+
+.chat-archive-backup{
+ max-width:850px;
+ margin:30px auto;
+ padding:25px 20px;
+ background:#fff;
+ border:1px solid #ddd;
+ border-radius:12px;
+ color:#222;
+ font-family:Arial,"Malgun Gothic",sans-serif;
+}
+
+.chat-archive-backup .archive-header{
+ text-align:center;
+ padding:25px 10px;
+ border-bottom:1px solid #ddd;
+ margin-bottom:25px;
+}
+
+.chat-archive-backup .archive-header h2{
+ font-size:25px;
+ letter-spacing:5px;
+ margin:10px 0;
+}
+
+.chat-archive-backup .archive-header p{
+ font-size:11px;
+ color:#999;
+}
+
+.chat-archive-backup .msg{
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ margin:17px 0;
+}
+
+.chat-archive-backup .msg.right{
+ align-items:flex-end;
+}
+
+.chat-archive-backup.all-left .msg.right{
+ align-items:flex-start;
+}
+
+.chat-archive-backup .sender{
+ font-size:11px;
+ color:#888;
+ margin:0 4px 6px;
+}
+
+.chat-archive-backup .bubble{
+ max-width:82%;
+ padding:12px 15px;
+ border-radius:${radius};
+ color:#222;
+ font-size:14px;
+ line-height:1.8;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+
+.chat-archive-backup .day{
+ text-align:center;
+ margin:28px 0 22px;
+ color:#777;
+ font-size:12px;
+}
+
+.chat-archive-backup .day span{
+ display:inline-block;
+ background:#eee;
+ padding:7px 14px;
+ border-radius:20px;
+}
+
+.chat-archive-backup .archive-footer{
+ text-align:center;
+ padding:25px 10px 5px;
+ color:#aaa;
+ font-size:10px;
+ letter-spacing:2px;
+}
+
+@media(max-width:550px){
+ .chat-archive-backup{
+  padding:18px 12px;
+ }
+ .chat-archive-backup .bubble{
+  max-width:90%;
+ }
+}
+`;
+
+ const output=
+ '<style>'+css+'</style>'+
+ '<div class="chat-archive-backup '+alignClass+'">'+
+ '<div class="archive-header">'+
+ '<h2>CHAT LOG.</h2>'+
+ '<p>A COLLECTION OF OUR STORIES</p>'+
+ '</div>'+
+ body+
+ '<div class="archive-footer">CHAT ARCHIVE · PRIVATE RECORDS</div>'+
+ '</div>';
+
+ try{
+  await navigator.clipboard.writeText(output);
+  alert('HTML 복사 완료');
+ }catch(error){
+  const textarea=document.createElement('textarea');
+  textarea.value=output;
+  textarea.style.position='fixed';
+  textarea.style.opacity='0';
+  document.body.appendChild(textarea);
+  textarea.select();
+
+  const copied=document.execCommand('copy');
+  textarea.remove();
+
+  if(copied){
+   alert('HTML 복사 완료');
+  }else{
+   alert('복사 실패 (브라우저 권한 확인)');
+  }
+ }
+});
+
 
  const left=esc($('nameA').value||'화자 1');
  const right=esc($('nameB').value||'화자 2');
