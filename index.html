@@ -60,7 +60,7 @@ header h1{font-size:25px}
 <main>
 <section class="panel">
 <h2>01. 대화 내용 입력</h2>
-<textarea id="chatInput" placeholder="[쭝] [오전 5:56] 쭝 입장&#10;[삼] [오후 12:22] 이모티콘&#10;[삼] [오후 12:23] 아 인장 ㅋㅋㅋㅋㅋ"></textarea>
+<textarea id="chatInput" placeholder=""></textarea>
 <p class="hint">
 카카오톡에서 복사한 대화를 그대로 붙여넣어 줘.<br>
 [이름] [오전/오후 시간] 메시지 형식을 자동으로 인식해.
@@ -84,6 +84,17 @@ header h1{font-size:25px}
 <input type="text" id="nameB" value="화자 2">
 </div>
 </div>
+ <div class="row" style="margin-top:18px;">
+  <div>
+    <label for="leftColor">왼쪽 말풍선 색상</label>
+    <input type="text" id="leftColor" value="#eeeeee" placeholder="#eeeeee">
+  </div>
+  <div>
+    <label for="rightColor">오른쪽 말풍선 색상</label>
+    <input type="text" id="rightColor" value="#292929" placeholder="#292929">
+  </div>
+</div>
+<p class="hint">HTML 색상 코드로 원하는 색을 입력해 줘. 예: #FFB6C1</p>
 <p class="hint">첫 번째로 등장한 화자는 왼쪽, 두 번째 화자는 오른쪽에 표시돼.</p>
 </section>
 
@@ -117,7 +128,12 @@ function esc(s){
  '"':'&quot;',"'":'&#39;'
  }[c]));
 }
-
+function safeColor(value, fallback){
+  const color=value.trim();
+  return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(color)
+    ? color
+    : fallback;
+}
 // 카카오톡 복사 형식 분석
 function parseChat(text){
  const lines=text.replace(/^\uFEFF/,'').replace(/\r/g,'').split('\n');
@@ -171,6 +187,8 @@ function render(){
  const query=$('search').value.trim().toLowerCase();
  const left=$('nameA').value.trim()||'화자 1';
  const right=$('nameB').value.trim()||'화자 2';
+ const leftColor=safeColor($('leftColor').value,'#eeeeee');
+const rightColor=safeColor($('rightColor').value,'#292929');
 
  if(!messages.length){
   $('conversation').innerHTML=
@@ -195,8 +213,8 @@ function render(){
 
   html+='<div class="msg '+side+'">';
   html+='<div class="sender">'+esc(display)+'</div>';
-  html+='<div class="bubble">'+esc(m.content)+'</div>';
-  html+='<div class="time">'+esc(m.time)+'</div>';
+const bubbleColor=side==='left'?leftColor:rightColor;
+html+='<div class="bubble" style="background-color:'+bubbleColor+'">'+esc(m.content)+'</div>';
   html+='</div>';
   count++;
  });
@@ -240,7 +258,8 @@ $('clear').addEventListener('click',()=>{
 $('search').addEventListener('input',render);
 $('nameA').addEventListener('input',render);
 $('nameB').addEventListener('input',render);
-
+$('leftColor').addEventListener('input',render);
+$('rightColor').addEventListener('input',render);
 $('download').addEventListener('click',()=>{
  if(!messages.length){
   alert('먼저 대화를 변환해 줘!');
@@ -249,6 +268,8 @@ $('download').addEventListener('click',()=>{
 
  const left=esc($('nameA').value||'화자 1');
  const right=esc($('nameB').value||'화자 2');
+ const leftColor=safeColor($('leftColor').value,'#eeeeee');
+const rightColor=safeColor($('rightColor').value,'#292929');
  let body='';
  let previousDate=null;
 
@@ -261,8 +282,8 @@ $('download').addEventListener('click',()=>{
   const side=m.sender===participants[0]?'left':'right';
   body+='<div class="msg '+side+'">';
   body+='<div class="sender">'+(side==='left'?left:right)+'</div>';
-  body+='<div class="bubble">'+esc(m.content)+'</div>';
-  body+='<div class="time">'+esc(m.time)+'</div>';
+ const bubbleColor=side==='left'?leftColor:rightColor;
+body+='<div class="bubble" style="background-color:'+bubbleColor+'">'+esc(m.content)+'</div>';
   body+='</div>';
  });
 
