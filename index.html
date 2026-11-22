@@ -45,7 +45,16 @@ button.secondary:hover{background:#ddd}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
 .actions button{flex:1}
 #status{font-size:12px;color:#777;margin-top:12px}
-#conversation{background:white;border:1px solid #ddd;border-radius:12px;padding:25px 20px;min-height:180px}
+#conversation{
+background:white;
+border:1px solid #ddd;
+border-radius:12px;
+padding:25px 20px;
+min-height:180px;
+max-height:500px;
+overflow-y:auto;
+overflow-x:hidden;
+}
 .day{text-align:center;margin:28px 0 22px;color:#777;font-size:12px}
 .day span{background:#eee;padding:7px 14px;border-radius:20px}
 .msg{display:flex;flex-direction:column;align-items:flex-start;margin:17px 0}
