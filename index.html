@@ -228,9 +228,6 @@ $('convert').addEventListener('click',()=>{
   $('status').textContent='인식된 대화가 없어. [이름] [오전 5:56] 형식인지 확인해 줘.';
   return;
  }
-
- $('nameA').value=participants[0]||'화자 1';
- $('nameB').value=participants[1]||'화자 2';
  $('status').textContent='변환 완료! 총 '+messages.length+'개 메시지를 인식했어.';
  render();
 });
