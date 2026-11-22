@@ -51,20 +51,14 @@ header h1{font-size:25px}
 </head>
 <body>
 <header>
-<small>PRIVATE CONVERSATION ARCHIVE</small>
-<h1>CHAT LOG.</h1>
-<p>A COLLECTION OF OUR STORIES</p>
+<h1>백업을 하자</h1>
 </header>
 
 <main>
 <section class="panel">
 <h2>01. 대화 내용 입력</h2>
 <textarea id="chatInput" placeholder=""></textarea>
-<p class="hint">
-카카오톡에서 복사한 대화를 그대로 붙여넣어 줘.<br>
-[이름] [오전/오후 시간] 메시지 형식을 자동으로 인식해.
-</p>
-<div id="status">아직 입력된 대화가 없어.</div>
+<div id="status">입력된 대화 없음</div>
 </section>
 
 <section class="panel">
@@ -90,10 +84,7 @@ header h1{font-size:25px}
 <input type="text" id="rightColor" value="#eeeeee" placeholder="#eeeeee">
 </div>
 </div>
-
-<p class="hint">HTML 색상 코드로 원하는 색을 입력해 줘. 예: #FFB6C1</p>
-<p class="hint">첫 번째로 등장한 화자는 왼쪽, 두 번째 화자는 오른쪽에 표시돼.</p>
-
+ 
 <div class="actions">
 <button id="convert">대화록 변환하기</button>
 <button class="secondary" id="clear">초기화</button>
@@ -103,7 +94,7 @@ header h1{font-size:25px}
 <section class="panel">
 <h2>03. 대화 미리보기</h2>
 <div id="conversation">
-<div class="empty">CHAT ARCHIVE<br><br>대화를 입력하고 변환하기를 눌러 줘.</div>
+<div class="empty">CHAT ARCHIVE</div>
 </div>
 <div class="actions">
 <button id="download">HTML 다운로드</button>
@@ -217,7 +208,7 @@ $('convert').addEventListener('click',()=>{
  const raw=$('chatInput').value;
 
  if(!raw.trim()){
-  $('status').textContent='대화 내용을 먼저 붙여넣어 줘!';
+  $('status').textContent='대화 내용을 먼저 붙여넣자';
   return;
  }
 
@@ -225,10 +216,10 @@ $('convert').addEventListener('click',()=>{
  participants=[...new Set(messages.map(m=>m.sender))];
 
  if(!messages.length){
-  $('status').textContent='인식된 대화가 없어. [이름] [오전 5:56] 형식인지 확인해 줘.';
+  $('status').textContent='인식된 대화 없음. [이름] [오전 5:56] 형식인지 확인';
   return;
  }
- $('status').textContent='변환 완료! 총 '+messages.length+'개 메시지를 인식했어.';
+ $('status').textContent='변환 완료';
  render();
 });
 
@@ -236,7 +227,7 @@ $('clear').addEventListener('click',()=>{
  $('chatInput').value='';
  messages=[];
  participants=[];
- $('status').textContent='초기화했어.';
+ $('status').textContent='초기화.';
  render();
 });
 
