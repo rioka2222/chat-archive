@@ -296,14 +296,40 @@ $('bubbleAlign').addEventListener('change', function () {
   );
 });
 
+
 $('download').addEventListener('click', async()=>{
  if(!messages.length){
-  alert('먼저 대화를 변환해 주세요');
+  alert('먼저 대화를 변환해 줘!');
   return;
  }
 
+ const left=esc($('nameA').value.trim()||'화자 1');
+ const right=esc($('nameB').value.trim()||'화자 2');
+
+ const leftColor=safeColor($('leftColor').value,'#eeeeee');
+ const rightColor=safeColor($('rightColor').value,'#eeeeee');
+
  const radius=$('bubbleRadius').value;
  const alignClass=$('bubbleAlign').value==='left'?'all-left':'';
+
+ let body='';
+ let previousDate=null;
+
+ messages.forEach(m=>{
+  if(m.date && m.date!==previousDate){
+   body+='<div class="day"><span>'+esc(m.date)+'</span></div>';
+   previousDate=m.date;
+  }
+
+  const side=m.sender===participants[0]?'left':'right';
+  const display=side==='left'?left:right;
+  const bubbleColor=side==='left'?leftColor:rightColor;
+
+  body+='<div class="msg '+side+'">';
+  body+='<div class="sender">'+display+'</div>';
+  body+='<div class="bubble" style="background-color:'+bubbleColor+'">'+esc(m.content)+'</div>';
+  body+='</div>';
+ });
 
  const css=`
 .chat-archive-backup,
@@ -435,46 +461,6 @@ $('download').addEventListener('click', async()=>{
    alert('복사 실패 (브라우저 권한 확인)');
   }
  }
-});
-
-
- const left=esc($('nameA').value||'화자 1');
- const right=esc($('nameB').value||'화자 2');
- const leftColor=safeColor($('leftColor').value,'#eeeeee');
- const rightColor=safeColor($('rightColor').value,'#eeeeee');
-
- let body='';
- let previousDate=null;
-
- messages.forEach(m=>{
-  if(m.date && m.date!==previousDate){
-   body+='<div class="day"><span>'+esc(m.date)+'</span></div>';
-   previousDate=m.date;
-  }
-
-  const side=m.sender===participants[0]?'left':'right';
-  const bubbleColor=side==='left'?leftColor:rightColor;
-
-  body+='<div class="msg '+side+'">';
-  body+='<div class="sender">'+(side==='left'?left:right)+'</div>';
-  body+='<div class="bubble" style="background-color:'+bubbleColor+'">'+esc(m.content)+'</div>';
-  body+='</div>';
- });
-
-const radius=$('bubbleRadius').value;
-const alignClass=$('bubbleAlign').value==='left'?'all-left':'';
-
-const css=':root{--bubble-radius:'+radius+';}'
- +document.querySelector('style').textContent;
-
-const output='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CHAT ARCHIVE</title><style>'+css+'</style></head><body class="'+alignClass+'"><header><small>PRIVATE CONVERSATION ARCHIVE</small><h1>CHAT LOG.</h1><p>A COLLECTION OF OUR STORIES</p></header><main><section id="conversation">'+body+'</section></main><footer>CHAT ARCHIVE · PRIVATE RECORDS</footer></body></html>';
- const blob=new Blob([output],{type:'text/html;charset=utf-8'});
- const url=URL.createObjectURL(blob);
- const a=document.createElement('a');
- a.href=url;
- a.download='chat-archive.html';
- a.click();
- URL.revokeObjectURL(url);
 });
 </script>
 </body>
